@@ -1,0 +1,14 @@
+*.iml
+.idea/
+*.csv
+target/
+
+Data/Test/covtypeOrigNorm_test.arff
+Data/Test/fcTe_test.arff
+Data/Test/KDDTe5Classes_test.arff
+Data/Test/SynEDC20D40Norm_test.arff
+
+Data/Train/covtypeOrigNorm_train.arff
+Data/Train/fcTe_train.arff
+Data/Train/KDDTe5Classes_train.arff
+Data/Train/SynEDC20D40Norm_train.arff
