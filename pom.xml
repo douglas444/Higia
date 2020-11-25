@@ -35,11 +35,6 @@
             <version>0.5.0</version>
         </dependency>
         <dependency>
-            <groupId>com.yahoo.labs.samoa</groupId>
-            <artifactId>samoa-instances</artifactId>
-            <version>0.2.0</version>
-        </dependency>
-        <dependency>
             <groupId>nz.ac.waikato.cms.moa</groupId>
             <artifactId>moa</artifactId>
             <version>2020.07.1</version>

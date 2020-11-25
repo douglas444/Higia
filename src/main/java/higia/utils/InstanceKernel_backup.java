@@ -17,7 +17,7 @@
  *    
  *    
  */
-package utils;
+package main.java.higia.utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,9 +28,9 @@ import moa.cluster.CFCluster;
 import com.yahoo.labs.samoa.instances.DenseInstance;
 import com.yahoo.labs.samoa.instances.Instance;
 
-import Clusters.SummClusters;
+import main.java.higia.Clusters.SummClusters;
 
-public class InstanceKernel extends CFCluster {
+public class InstanceKernel_backup extends CFCluster {
 
 	private static final long serialVersionUID = 1L;
 
@@ -39,83 +39,45 @@ public class InstanceKernel extends CFCluster {
 
 	protected double LST;
 	protected double SST;
-
+	
 	public ArrayList<Instance> inst = new ArrayList<>();
 
 	int veloc = 0;
-	int max = 10000;
-	double minDist = 0.6;
 
-	public InstanceKernel(Instance instance, int dimensions, long timestamp) {
+	public InstanceKernel_backup(Instance instance, int dimensions, long timestamp) {
 		super(instance, dimensions);
 		this.LST = timestamp;
 		this.SST = timestamp * timestamp;
 		this.inst.add(instance);
 	}
 
-	public InstanceKernel(InstanceKernel cluster) {
+	public InstanceKernel_backup(InstanceKernel_backup cluster) {
 		super(cluster);
 		this.LST = cluster.LST;
 		this.SST = cluster.SST;
-		this.inst.add(new DenseInstance(1, cluster.getCenter()));
+		this.inst.add(new DenseInstance(1,cluster.getCenter()));
 	}
 
 	public void insert(Instance instance, long timestamp) {
-		if (N < max) {
-			N++;
-			LST += timestamp;
-			SST += timestamp * timestamp;
+		N++;
+		LST += timestamp;
+		SST += timestamp * timestamp;
 
-			for (int i = 0; i < instance.numValues(); i++) {
-				LS[i] += instance.value(i);
-				SS[i] += instance.value(i) * instance.value(i);
-			}
-			this.inst.add(instance);
-
-		} else {
-//			N++;
-			LST += timestamp;
-			SST += timestamp * timestamp;
-
-			for (int i = 0; i < instance.numValues(); i++) {
-				this.LS[i] -= this.inst.get(0).value(i);
-				this.SS[i] -= this.inst.get(0).value(i) * this.inst.get(0).value(i);
-
-				this.LS[i] += instance.value(i);
-				this.SS[i] += instance.value(i) * instance.value(i);
-			}
-			this.inst.remove(0);
-			this.inst.add(instance);
-
+		for (int i = 0; i < instance.numValues(); i++) {
+			LS[i] += instance.value(i) ;
+			SS[i] += instance.value(i) * instance.value(i);
 		}
 	}
 
-	public void add(InstanceKernel other) {
+	public void add(InstanceKernel_backup other) {
 		assert (other.LS.length == this.LS.length);
-		if (N < max) {
-			this.N += other.N;
-			this.LST += other.LST;
-			this.SST += other.SST;
+		this.N += other.N;
+		this.LST += other.LST;
+		this.SST += other.SST;
 
-			for (int i = 0; i < LS.length; i++) {
-				this.LS[i] += other.LS[i];
-				this.SS[i] += other.SS[i];
-			}
-
-		} else {
-//			this.N += other.N;
-			this.LST += other.LST;
-			this.SST += other.SST;
-
-			for (int i = 0; i < LS.length; i++) {
-				this.LS[i] -= this.inst.get(0).value(i);
-				this.SS[i] -= this.inst.get(0).value(i) * this.inst.get(0).value(i);
-				
-				this.LS[i] += other.LS[i];
-				this.SS[i] += other.SS[i];
-			}
-			this.inst.remove(0);
-			this.inst.add(new DenseInstance(1, other.getCenter()));
+		for (int i = 0; i < LS.length; i++) {
+			this.LS[i] += other.LS[i];
+			this.SS[i] += other.SS[i];
 		}
 	}
 
@@ -151,18 +113,10 @@ public class InstanceKernel extends CFCluster {
 	public double getRadius() {
 		// trivial cluster
 		if (N == 1)
-			return minDist;
+			return 0;
 
 		return getDeviationElaine() * 2.0;
-//		return minDist;
-//		return getDeviationElaine() * 1.0;
-//		System.out.println(getDeviation());
 //		return getDeviation() * 2.0;
-	}
-	
-	public void setRadius(double radius) {
-		
-		minDist = radius;
 	}
 
 	// sum of arrays
@@ -172,11 +126,11 @@ public class InstanceKernel extends CFCluster {
 		double A[] = LS;
 		double rate = 1;
 //		System.out.println(rate);
-		Arrays.setAll(A, k -> (A[k] * (1)));
+		Arrays.setAll(A, k -> (A[k] * (1) ));
 		Arrays.setAll(B, k -> (B[k] * (rate)));
 		Arrays.setAll(result, k -> (A[k] + B[k]));
 //		Arrays.setAll(result, k -> (result[k]));
-		N += (newN * rate);
+		N+=(newN*rate);
 		setLS(result);
 //		setVeloc(1);
 
@@ -216,8 +170,10 @@ public class InstanceKernel extends CFCluster {
 		double res[] = new double[this.LS.length];
 		if (veloc == 0) {
 			for (int i = 0; i < res.length; i++) {
-				res[i] = (this.LS[i] / (N));
+				res[i] = (this.LS[i] / (N)) ;
 			}
+				
+				
 
 		} else
 

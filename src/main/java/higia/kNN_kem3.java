@@ -1,4 +1,4 @@
-
+package main.java.higia;
 /*
  *    kNN.java
  *
@@ -26,6 +26,7 @@ import java.util.Arrays;
 
 import java.util.Random;
 
+import br.com.douglas444.datastreamenv.common.ConceptCategory;
 import moa.classifiers.AbstractClassifier;
 import moa.classifiers.MultiClassClassifier;
 import moa.classifiers.lazy.neighboursearch.KDTree;
@@ -33,13 +34,13 @@ import moa.classifiers.lazy.neighboursearch.LinearNNSearch;
 import moa.classifiers.lazy.neighboursearch.NearestNeighbourSearch;
 import moa.core.Measurement;
 import moa.gui.visualization.DataPoint;
-import utils.ConDis;
-import utils.DriftEvolution;
-import utils.InstanceKernel;
-import utils.MicroCluster;
-import utils.NearestNeighbours;
-import Clusters.ClusteringBla;
-import Clusters.SummClusters;
+import main.java.higia.utils.ConDis;
+import main.java.higia.utils.DriftEvolution;
+import main.java.higia.utils.InstanceKernel;
+import main.java.higia.utils.MicroCluster;
+import main.java.higia.utils.NearestNeighbours;
+import main.java.higia.Clusters.ClusteringBla;
+import main.java.higia.Clusters.SummClusters;
 
 import com.yahoo.labs.samoa.instances.DenseInstance;
 import com.yahoo.labs.samoa.instances.Instance;
@@ -61,7 +62,7 @@ import com.github.javacliparser.MultiChoiceOption;
  * @author Jesse Read (jesse@tsc.uc3m.es)
  * @version 03.2012
  */
-public class kNN_kem extends AbstractClassifier implements MultiClassClassifier {
+public class kNN_kem3 extends AbstractClassifier implements MultiClassClassifier {
 	private static final long serialVersionUID = 1L;
 
 	private boolean initialized;
@@ -98,8 +99,6 @@ public class kNN_kem extends AbstractClassifier implements MultiClassClassifier 
 	double kernel = 1;
 	double maxClusters = 0;
 	double learningRate = 0.5;
-	
-	String out1 = "";
 
 	// this is just a test
 	// double kernel
@@ -129,8 +128,8 @@ public class kNN_kem extends AbstractClassifier implements MultiClassClassifier 
 			clusteringBla = new ClusteringBla();
 
 			try {
-				File file = new File(out1+"higia_output.txt");
-				File file2 = new File(out1+"higia_centers.txt");
+				File file = new File("/home/kemilly/example.txt");
+				File file2 = new File("/home/kemilly/example_centers.txt");
 				if (file.exists())
 					file.delete();
 				if (file2.exists())
@@ -216,69 +215,10 @@ public class kNN_kem extends AbstractClassifier implements MultiClassClassifier 
 				this.maxClusters = this.windowKernel.size();
 				System.out.println(maxClusters);
 //				this.maxClusters = this.maxClusters * 1.2;
-//				System.out.println(minClusters);
+
 			}
 		}
 
-	}
-
-	public boolean testEstupido(Instance inst) {
-
-		int lineSize = inst.toDoubleArray().length - 1;
-		double[] data = new double[lineSize];
-
-		for (int j = 0; j < lineSize; j++) {
-			data[j] = inst.toDoubleArray()[j];
-		}
-
-		Instance inst2 = new DenseInstance(1, data);
-
-		InstanceKernel inKe = new InstanceKernel(inst2, inst2.numAttributes(), timestamp);
-
-//		// get kOption neighbours 
-		ArrayList<NearestNeighbours> neighbours = kClosestNeighbor(inKe, kOption.getValue());
-		double[] votes = new double[classes.size()];
-		double minDist = Double.MAX_VALUE;
-		int index = 1;
-
-//		System.out.println("$$$$$$$$");
-		for (int i = 0; i < neighbours.size(); i++) {
-
-			double foo = Double.parseDouble(neighbours.get(i).getKernel().getLabel());
-//			// if the dist is less or equal to the radius of the closest cluster
-			votes[(int) foo]++;
-			index = neighbours.get(i).getIndex();
-
-			// minimal dist to the closets cluster
-//			double dist = distance(data, neighbours.get(i).getKernel().getCenter());
-//			System.out.println(Arrays.toString(data));
-//			System.out.println("distancia " + dist);
-//			System.out.println("i " + i);
-//			System.out.println("label " + neighbours.get(i).getKernel().getLabel());
-//			System.out.println("center nei " + Arrays.toString(neighbours.get(i).getKernel().getCenter()));
-//			System.out.println("center nei index " + neighbours.get(i).getIndex());
-//			if (dist < minDist) {
-//				minDist = dist;
-//				index = neighbours.get(i).getIndex();
-//			}
-
-		}
-
-//		System.out.println("votes " + (double)max(votes));
-//		System.out.println("votes " + Arrays.toString(votes));
-//		System.out.println("closest predicted " + windowKernel.get(index).getLabel());		
-//		System.out.println("center real " + Arrays.toString( windowKernel.get(index).getCenter()));
-//		System.out.println("center index " + index);
-//		System.out.println("real " + inst.toDoubleArray()[lineSize]);
-
-		if ((double) max(votes) == inst.classValue()) {
-
-			return true;
-		}
-
-		int o = 0;
-		o++;
-		return false;
 	}
 
 	public void modelUpdate() throws IOException {
@@ -318,11 +258,21 @@ public class kNN_kem extends AbstractClassifier implements MultiClassClassifier 
 
 	public void removeClusters() {
 
+		long threshold = timestamp - clusteringBla.getTimeWindow();
 		for (int i = 0; i < this.windowKernel.size(); i++) {
-			if (windowKernel.get(i).getTime() < (timestamp - 1000) && this.windowKernel.size() >500) {
-				windowKernel.remove(i);
-				i--;
+//			System.out.println(this.windowKernel.get(i).getThreshold());
+			if (this.windowKernel.get(i).getThreshold() <= 0) {
+				
+				this.windowKernel.remove(i);
 			}
+
+//			if (this.windowKernel.get(i).getRelevanceStamp() <= threshold) {
+//				if (this.windowKernel.size() > (clusteringBla.getTimeWindow() / 2)) {
+//
+//					this.windowKernel.remove(i);
+//				}
+//			}
+
 		}
 
 	}
@@ -347,29 +297,23 @@ public class kNN_kem extends AbstractClassifier implements MultiClassClassifier 
 
 		String[] info = testInstance(inKe, neighbours, inst.getCenter()[lineSize]);
 
-		output.write(Double.toString(inst.getCenter()[lineSize]));
-		output.write(", " + info[0]);
-		output.write(", " + info[1]);
+		output.write("true " + Double.toString(inst.getCenter()[lineSize]));
+		output.write(" class , " + info[0]);
+		output.write(" type , " + info[1]);
 		output.newLine();
 
 		if (timestamp % 1000 == 0) {
-
+			
 			for (int i = 0; i < this.windowKernel.size(); i++) {
 //				System.out.println(this.windowKernel.get(i).getN());
-				outputCenters.write(Integer.toString((int) timestamp));
+				outputCenters.write(Integer.toString((int)timestamp));
 				outputCenters.write(", ");
-				for (int j = 0; j < lineSize; j++) {
-					outputCenters.write(Double.toString(this.windowKernel.get(i).getCenter()[j]));
-					outputCenters.write(", ");
-				}
-//				outputCenters.write(Arrays.toString(this.windowKernel.get(i).getCenter()));
-//				outputCenters.write(", ");
+				outputCenters.write(Arrays.toString(this.windowKernel.get(i).getCenter()));
+				outputCenters.write(", ");
 				outputCenters.write(Double.toString(this.windowKernel.get(i).getRadius()));
 				outputCenters.write(", ");
-//				outputCenters.write(Double.toString(this.windowKernel.get(i).getThreshold()));
-
-//				outputCenters.write(Double.toString(this.windowKernel.get(i).getId()));
-//				outputCenters.write(", ");
+				outputCenters.write(Double.toString(this.windowKernel.get(i).getThreshold()));
+				outputCenters.write(", ");
 				outputCenters.write(this.windowKernel.get(i).getLabel());
 				outputCenters.newLine();
 			}
@@ -390,8 +334,8 @@ public class kNN_kem extends AbstractClassifier implements MultiClassClassifier 
 	// ver se eh novidade ou extensao
 	public void detectingThings(InstanceKernel in) throws Exception {
 
-		int minClusters = 100;
-		int minNovelty = 200;
+		int minClusters = 50;
+		int minNovelty = 1000;
 		int sim = 0;
 
 //		System.out.println("neWindow " + this.neWindow.size());
@@ -400,7 +344,7 @@ public class kNN_kem extends AbstractClassifier implements MultiClassClassifier 
 		// window is empty -> initial training phase
 
 		if (this.neWindow.size() < minNovelty) {
-			MicroCluster micro = new MicroCluster(in, "", "anormal", timestamp);
+			MicroCluster micro = new MicroCluster(in, "", "anormal", timestamp, ConceptCategory.NOVELTY);
 			this.neWindow.add(micro);
 
 		} else {
@@ -465,7 +409,7 @@ public class kNN_kem extends AbstractClassifier implements MultiClassClassifier 
 					// 3.1 Try to forget old kernels
 					for (int i = 0; i < this.neWindow.size(); i++) {
 						if (this.neWindow.get(i).getRelevanceStamp() < threshold) {
-							MicroCluster element = new MicroCluster(in, "", "anormal", timestamp);
+							MicroCluster element = new MicroCluster(in, "", "anormal", timestamp, ConceptCategory.NOVELTY);
 							this.neWindow.set(i, element);
 							sim = 1;
 //							 return;
@@ -474,27 +418,27 @@ public class kNN_kem extends AbstractClassifier implements MultiClassClassifier 
 				}
 
 				if (sim == 0) {
-					// eh pior assim
-//					// 3.2 Merge closest two kernels
-//					int closestA = 0;
-//					int closestB = 0;
-//					minDistance = Double.MAX_VALUE;
-//					for (int i = 0; i < this.neWindow.size(); i++) {
-//						double[] centerA = this.neWindow.get(i).getCenter();
-//						for (int j = i + 1; j < this.neWindow.size(); j++) {
-//							double dist = distance(centerA, this.neWindow.get(j).getCenter());
-//							if (dist < minDistance) {
-//								minDistance = dist;
-//								closestA = i;
-//								closestB = j;
-//							}
-//						}
-//					}
-//					assert (closestA != closestB);
-//
-//					this.neWindow.get(closestA).add(this.neWindow.get(closestB));
-//					MicroCluster element = new MicroCluster(in, "", "anormal", timestamp);
-//					this.neWindow.set(closestB, element);
+
+					// 3.2 Merge closest two kernels
+					int closestA = 0;
+					int closestB = 0;
+					minDistance = Double.MAX_VALUE;
+					for (int i = 0; i < this.neWindow.size(); i++) {
+						double[] centerA = this.neWindow.get(i).getCenter();
+						for (int j = i + 1; j < this.neWindow.size(); j++) {
+							double dist = distance(centerA, this.neWindow.get(j).getCenter());
+							if (dist < minDistance) {
+								minDistance = dist;
+								closestA = i;
+								closestB = j;
+							}
+						}
+					}
+					assert (closestA != closestB);
+
+					this.neWindow.get(closestA).add(this.neWindow.get(closestB));
+					MicroCluster element = new MicroCluster(in, "", "anormal", timestamp, ConceptCategory.NOVELTY);
+					this.neWindow.set(closestB, element);
 				}
 
 				for (int i = 0; i < this.neWindow.size(); i++) {
@@ -514,14 +458,12 @@ public class kNN_kem extends AbstractClassifier implements MultiClassClassifier 
 						}
 						if (minDistance <= (this.windowKernel.get(indiceCluster).getRadius() * threshold)) {
 							newClass = Double.parseDouble(this.windowKernel.get(indiceCluster).getLabel());
-							this.neWindow.get(i).setType("extension");
 						} else {
 							classes.add(Double.toString(newClass));
-							this.neWindow.get(i).setType("novelty");
 						}
 
 						this.neWindow.get(i).setLabel(Double.toString(newClass));
-						
+						this.neWindow.get(i).setType("novelty");
 
 						this.windowKernel.add(this.neWindow.get(i));
 
@@ -541,10 +483,6 @@ public class kNN_kem extends AbstractClassifier implements MultiClassClassifier 
 
 	}
 
-	public void setOutFile(String string) {
-		this.out1 = string;
-	}
-	
 	// get distance from k closest windowKernel
 	public ArrayList<NearestNeighbours> kClosestNeighbor(InstanceKernel inst, int kOption) {
 
@@ -556,24 +494,15 @@ public class kNN_kem extends AbstractClassifier implements MultiClassClassifier 
 		double minDistance = Double.MAX_VALUE;
 		Random rand = new Random();
 		// first koption distances
-//		System.out.println("0000000");
-//		for(int i = 0; i < windowKernel.size(); i ++)
-//			System.out.println(Arrays.toString(windowKernel.get(i).getCenter()));
-//		System.out.println("0000000");
 		for (int i = 0; i < votes.length; i++) {
 			int n = rand.nextInt(this.windowKernel.size());
-//			int n = i;
-//			System.out.println(Arrays.toString(windowKernel.get(n).getCenter()));
 			double dis = distance(inst.getCenter(), this.windowKernel.get(n).getCenter());
-//			System.out.println("1 - " + dis);
-			votes[i] = new NearestNeighbours(n, dis, this.windowKernel.get(n));
+			votes[i] = new NearestNeighbours(i, dis, this.windowKernel.get(n));
 		}
 		for (int i = 0; i < this.windowKernel.size(); i++) {
 			double distance = distance(inst.getCenter(), this.windowKernel.get(i).getCenter());
-//			System.out.println("indice " + i + " 2 - " + distance);
-			int first = -1;
+			int first = 0;
 			double maxDistance = Double.MIN_VALUE;
-			// biggest distance
 			for (int j = 0; j < votes.length; j++) {
 				if (votes[j].getDistance() > maxDistance) {
 					maxDistance = votes[j].getDistance();
@@ -581,10 +510,7 @@ public class kNN_kem extends AbstractClassifier implements MultiClassClassifier 
 				}
 			}
 
-//			System.out.println("i from loop " + i);
-			// replace with the biggest from the array votes
 			if (distance < votes[first].getDistance()) {
-//				System.out.println("i from if " + i);
 				closestKernel = this.windowKernel.get(i);
 				nN = new NearestNeighbours(i, distance, closestKernel);
 				votes[first] = nN;
@@ -594,12 +520,6 @@ public class kNN_kem extends AbstractClassifier implements MultiClassClassifier 
 
 		ArrayList<NearestNeighbours> votesList;
 		votesList = new ArrayList<>(Arrays.asList(votes));
-//		System.out.println("$$$$$$$$$$$$$$$$$$$");
-//		for(int i = 0; i < votesList.size(); i ++) {
-//			System.out.println(Arrays.toString(votesList.get(i).getKernel().getCenter()));
-//			System.out.println("list " + votesList.get(i).getIndex());
-//			System.out.println("list " + votesList.get(i).getKernel().getLabel());
-//		}
 
 		return votesList;
 	}
@@ -614,10 +534,10 @@ public class kNN_kem extends AbstractClassifier implements MultiClassClassifier 
 		info[0] = "";
 		info[1] = "";
 		double minDist = Double.MAX_VALUE;
-
 		int index = 0;
-		
-//		System.out.println("window size " + windowKernel.size());
+
+		Random rand = new Random();
+		int aux = 0;
 
 		// real classification
 		for (int i = 0; i < neighbours.size(); i++) {
@@ -632,89 +552,42 @@ public class kNN_kem extends AbstractClassifier implements MultiClassClassifier 
 			if (dist < minDist) {
 				minDist = dist;
 				index = neighbours.get(i).getIndex();
+				aux = i;
 			}
 
 		}
 
 		// majority vote
 		int valor = (kOption.getValue() / 2) + 1;
+
 //		System.out.println(Arrays.toString(votes) + "---" + realLabel);
+
 		threshold = this.windowKernel.get(index).getThreshold();
-		double thre = this.windowKernel.get(index).getThreshold();
 //		System.out.println(threshold);
-		if (votes[max(votes)] >= valor) {
-			// update closets cluster
-			if (minDist <= (this.windowKernel.get(index).getRadius())) {
-//				System.out.println("minDist " + minDist);
-				
-				// Double.toString(val); higher score
-				info[0] = Double.toString(max(votes));
-				info[1] = this.windowKernel.get(index).getType();
 
-//			double result[] = new double[inst.getCenter().length];
-//			Arrays.setAll(result, k -> (inst.getCenter()[k]));
-				this.windowKernel.get(index).insert(inst.getCenter(), (int) timestamp);
-//				System.out.println(Arrays.toString(votes) + "---" + realLabel);
-				
+		// update closets cluster
+		if (minDist <= (this.windowKernel.get(index).getRadius() )) {
+
+			// Double.toString(val); higher score
+			info[0] = Double.toString(max(votes));
+			info[1] = this.windowKernel.get(index).getType();
+
+			double result[] = new double[inst.getCenter().length];
+			Arrays.setAll(result, k -> (inst.getCenter()[k]));
+			this.windowKernel.get(index).insert(result, (int) timestamp);
 			
-			this.windowKernel.get(index).setThreshold(thre+0.00001);
-
-				DriftEvolution element = new DriftEvolution(inst, index);
-				this.driftList.add(element);
+			DriftEvolution element = new DriftEvolution(inst, index);
+			this.driftList.add(element);
 //			this.windowKernel.get(index).sum(inst.getCenter(), learningRate);
-				return info;
+			return info;
 
 //			this.threshold += 0.00001;
-			} 
-			else {
+		} else {
 			
-//			System.out.println(votes[max(votes)]);
-			if(votes[max(votes)] >=  valor & minDist < this.windowKernel.get(index).getRadius()*thre ) {
-
-				info[0] = Double.toString(max(votes));
-				info[1] = this.windowKernel.get(index).getType();
-				long threshold = timestamp - 1000; // Kernels before this can be forgotten
-				
-//				if(this.windowKernel.get(index).getRadius() == 0) {
-//					double radius = minDist;
-//					System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-//				}
-
-////				 3.1 Try to forget old kernels
-				if(this.windowKernel.size() >= 500) {
-					for (int i = 0; i < this.windowKernel.size(); i++) {
-						if (this.windowKernel.get(i).getRelevanceStamp() < threshold) {
-//							this.windowKernel.remove(i);
-							
-//							System.out.println(radius);
-							MicroCluster element = new MicroCluster(inst, info[0], "extension", timestamp);
-							this.windowKernel.set(i, element);
-//							this.windowKernel.get(i).setRadius(this.windowKernel.get(index).getRadius());
-//							System.out.println("radius " + this.windowKernel.get(i).getRadius());
-							return info;
-
-						}
-					}
-
-				} else {
-					double radius = minDist;
-					MicroCluster element = new MicroCluster(inst, info[0], "extension", timestamp);
-					this.windowKernel.add(element);
-//					this.windowKernel.get(this.windowKernel.size()-1).setRadius(this.windowKernel.get(index).getRadius());
-					return info;
-				}
-				
-				System.out.println("acontece");
-
-//				MicroCluster element = new MicroCluster(inst, info[0], "normal", timestamp);
-//				this.windowKernel.add(element);
-//				return info;
-			}
-
-				// System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-			}
+			
+			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 		}
-
+		
 //		System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 		int count = 0;
 //		System.out.println("before " + driftList.size());
@@ -735,7 +608,7 @@ public class kNN_kem extends AbstractClassifier implements MultiClassClassifier 
 
 				int ind = this.driftList.get(i).getIdCluster();
 //				this.windowKernel.get(ind).sum(this.driftList.get(i).getInstaceKernel().LS, learningRate, this.driftList.get(i).getInstaceKernel().getN());
-//				double thre = this.windowKernel.get(ind).getThreshold();
+				double thre = this.windowKernel.get(ind).getThreshold();
 //				System.out.println("entrou " + thre);
 //				this.windowKernel.get(ind).setThreshold(thre+0.00001);
 			}
@@ -767,18 +640,16 @@ public class kNN_kem extends AbstractClassifier implements MultiClassClassifier 
 			detectingThings(inst);
 //			System.out.println("window size " + windowKernel.size());
 //			System.out.println("new size " + neWindow.size());
-			this.windowKernel.get(index).setThreshold(this.windowKernel.get(index).getThreshold()- 0.00001);
-			this.threshold -= 0.00001;
-			info[0] = "-100";
-			info[1] = "unknown";
+//			this.windowKernel.get(index).setThreshold(this.windowKernel.get(index).getThreshold()- 0.00001);
+//			this.threshold -= 0.00001;
+			info[0] = "";
+			info[1] = "";
 		}
 
 //		// test baseline
 //		info[0] = Double.toString(max(votes));
 //		info[1] = "normal";
 //		System.out.println("threshold " + threshold);
-		
-//		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 		return info;
 
 	}

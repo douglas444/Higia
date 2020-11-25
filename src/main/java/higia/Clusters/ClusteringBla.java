@@ -1,21 +1,16 @@
-package Clusters;
+package main.java.higia.Clusters;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
+import br.com.douglas444.datastreamenv.common.ConceptCategory;
 import com.yahoo.labs.samoa.instances.DenseInstance;
 import com.yahoo.labs.samoa.instances.Instance;
 
 import moa.cluster.Clustering;
 import moa.evaluation.F1;
-import moa.evaluation.SilhouetteCoefficient;
 import moa.gui.visualization.DataPoint;
-import utils.InstanceKernel;
-import utils.MicroCluster;
-
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Vector;
+import main.java.higia.utils.InstanceKernel;
+import main.java.higia.utils.MicroCluster;
 
 public class ClusteringBla {
 
@@ -87,7 +82,7 @@ public class ClusteringBla {
 			for (int i = 0; i < microClusters.size(); i++) {
 				
 				MicroCluster mdtemp = new MicroCluster((InstanceKernel) microClusters.get(i), normClasses.get(c),
-						"normal", timestamp);
+						"normal", timestamp, ConceptCategory.KNOWN);
 
 //				System.out.println("N " + mdtemp.getN());
 //				System.out.println("radius " + mdtemp.getRadius());
@@ -147,7 +142,8 @@ public class ClusteringBla {
 		// test information
 		for (int i = 0; i < microClusters.size(); i++) {
 
-			MicroCluster mdtemp = new MicroCluster((InstanceKernel) microClusters.get(i), "", "", timestamp);
+			MicroCluster mdtemp = new MicroCluster((InstanceKernel) microClusters.get(i), "", "",
+					timestamp, null);
 
 			windowNewMicro.add(mdtemp);
 		}
@@ -166,7 +162,7 @@ public class ClusteringBla {
 		for (int i = 0; i < microClusters.size(); i++) {
 
 			MicroCluster mdtemp = new MicroCluster((InstanceKernel) microClusters.get(i), Double.toString(val),
-					"normal", timestamp);
+					"normal", timestamp, ConceptCategory.KNOWN);
 
 //			System.out.println("N " + mdtemp.getN());
 //			System.out.println("radius " + mdtemp.getRadius());

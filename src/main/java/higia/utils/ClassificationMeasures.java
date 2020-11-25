@@ -1,4 +1,4 @@
-package utils;
+package main.java.higia.utils;
 
 public class ClassificationMeasures {
 	public String name = null;

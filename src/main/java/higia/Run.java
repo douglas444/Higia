@@ -1,19 +1,17 @@
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
+package main.java.higia;
 
+import java.util.ArrayList;
+
+import br.com.douglas444.datastreamenv.common.ConceptCategory;
+import br.com.douglas444.datastreamenv.common.InterceptionResult;
 import com.github.javacliparser.FileOption;
 import com.yahoo.labs.samoa.instances.Instance;
 
 import moa.core.TimingUtils;
 import moa.gui.visualization.DataPoint;
 import moa.streams.clustering.FileStream;
-import utils.InstanceKernel;
-import utils.MicroCluster;
+import main.java.higia.utils.InstanceKernel;
+import main.java.higia.utils.MicroCluster;
 
 public class Run {
 
@@ -41,17 +39,6 @@ public class Run {
 
 	public void run( double rate) throws Exception {
 
-		BufferedWriter output = null;
-
-		try {
-			File file = new File("/home/kemilly/example.txt");
-			if (file.exists())
-				file.delete();
-			output = new BufferedWriter(new FileWriter(file));
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 
 		// datasets
 		FileStream stream = new FileStream();
@@ -100,7 +87,7 @@ public class Run {
 			// train
 			if (numberSamples <= numInstan) {
 
-				MicroCluster in = new MicroCluster(inKe, classValue, "normal", timestamp);
+				MicroCluster in = new MicroCluster(inKe, classValue, "normal", timestamp, ConceptCategory.KNOWN);
 				learner.setLimit_Option(numInstan);
 				learner.trainOnInstance(in, minClusters, dp);
 
@@ -192,62 +179,26 @@ public class Run {
 		double time = TimingUtils.nanoTimeToSeconds(TimingUtils.getNanoCPUTimeOfCurrentThread() - evaluateStartTime);
 		System.out.println(
 				numberSamples + " instances processed with " + accuracy + "% accuracy in " + time + " seconds.");
-		learner.stopFile();
-		output.close();
 	}
 
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
 
 		int minW = 3;
-		int k = 20;
-		double thres = 1.1;
-
+		int k = 1;
+		double threshold = 1.1;
 		double rate = 0.0;
 
-//		String defaultfile = "/home/kemilly/euler/SynD.arff";
-////		String defaultfile = "/home/kemilly/euler/GEARS_2C_2D.arff";
-//		defaultfile = "/home/kemilly/euler/moa3.arff";
-////		String defaultfile = "/home/kemilly/euler/1CDT.arff";
-////		defaultfile = "/home/kemilly/euler/covtypeNorm.arff";
-//
-//		int numTraining = 25000;
-////		numTraining = 19000;
-//		numTraining = 10000;
-////		numTraining = 1520;
-////		numTraining = 58101;
-//
-//		int minClusters = 100;
+		Run run = new Run(
+				minW,k,
+				threshold,
+				args[0],
+				Integer.parseInt(args[1]),
+				100,
+				"/higiaOutput");
 
-//		Run r = new Run(minW, k, thres, defaultfile, numTraining, minClusters);
-		// 10000 Synd 25000
-
-//		rate = 0.1;
-//		r.run(numTraining, rate);
-		System.out.println(Integer.toString(k));
-		Run r1 = new Run(minW,k, thres, "/home/kemilly/euler/SynD.arff", 25000, 100,		 "/home/kemilly/resultado/Higia/"+Integer.toString(k)+"KNN/synd/");
-		Run r2 = new Run(minW,k, thres, "/home/kemilly/euler/GEARS_2C_2D.arff", 19000, 100,  "/home/kemilly/resultado/Higia/"+Integer.toString(k)+"KNN/gears/");
-		Run r3 = new Run(minW,k, thres, "/home/kemilly/euler/moa3.arff", 10000, 100,   		 "/home/kemilly/resultado/Higia/"+Integer.toString(k)+"KNN/moa/");
-		Run r4 = new Run(minW,k, thres, "/home/kemilly/euler/1CDT.arff", 1520, 100, 		 "/home/kemilly/resultado/Higia/"+Integer.toString(k)+"KNN/CDT/");
-		Run r5 = new Run(minW,k, thres, "/home/kemilly/euler/covtypeNorm.arff", 58101, 100,  "/home/kemilly/resultado/Higia/"+Integer.toString(k)+"KNN/covertype/");
-		Run r6 = new Run(minW,k, thres, "/home/kemilly/euler/kdd99.arff", 49402, 100,   	 "/home/kemilly/resultado/Higia/"+Integer.toString(k)+"KNN/kdd/");
-		Run r7 = new Run(minW,k, thres, "/home/kemilly/euler/UG_2C_2D_on.arff", 5000, 100,   "/home/kemilly/resultado/Higia/"+Integer.toString(k)+"KNN/UG/");
-		
-		System.out.println("baseline experiments ");
-//		System.out.println("baseline synd ");
-//		r1.run(rate);
-//		System.out.println("baseline gears ");
-//		r2.run(rate);
-//		System.out.println("baseline moa ");
-//		r3.run(rate);
-		System.out.println("baseline cdt");
-		r4.run(rate);
-//		System.out.println("baseline covertype ");
-//		r5.run(rate);
-//		//System.out.println("baseline kdd ");
-//		//r6.run(rate);
-//		System.out.println("baseline UG ");
-//		r7.run(rate);
+		System.out.println("baseline moa ");
+		run.run(rate);
 
 	}
 

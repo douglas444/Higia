@@ -18,7 +18,7 @@
  *    Copyright (C) 1999-2012 University of Waikato
  */
 
-package utils;
+package main.java.higia.utils;
 
 import java.io.Serializable;
 import com.yahoo.labs.samoa.instances.Instance;

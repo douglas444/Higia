@@ -1,4 +1,4 @@
-package utils;
+package main.java.higia.utils;
 
 import java.util.Arrays;
 

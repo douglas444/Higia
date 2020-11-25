@@ -1,4 +1,4 @@
-
+package main.java.higia;
 /*
  *    kNN.java
  *
@@ -26,6 +26,7 @@ import java.util.Arrays;
 
 import java.util.Random;
 
+import br.com.douglas444.datastreamenv.common.ConceptCategory;
 import moa.classifiers.AbstractClassifier;
 import moa.classifiers.MultiClassClassifier;
 import moa.classifiers.lazy.neighboursearch.KDTree;
@@ -33,13 +34,13 @@ import moa.classifiers.lazy.neighboursearch.LinearNNSearch;
 import moa.classifiers.lazy.neighboursearch.NearestNeighbourSearch;
 import moa.core.Measurement;
 import moa.gui.visualization.DataPoint;
-import utils.ConDis;
-import utils.DriftEvolution;
-import utils.InstanceKernel;
-import utils.MicroCluster;
-import utils.NearestNeighbours;
-import Clusters.ClusteringBla;
-import Clusters.SummClusters;
+import main.java.higia.utils.ConDis;
+import main.java.higia.utils.DriftEvolution;
+import main.java.higia.utils.InstanceKernel;
+import main.java.higia.utils.MicroCluster;
+import main.java.higia.utils.NearestNeighbours;
+import main.java.higia.Clusters.ClusteringBla;
+import main.java.higia.Clusters.SummClusters;
 
 import com.yahoo.labs.samoa.instances.DenseInstance;
 import com.yahoo.labs.samoa.instances.Instance;
@@ -323,7 +324,7 @@ public class kNN_kem2 extends AbstractClassifier implements MultiClassClassifier
 		// window is empty -> initial training phase
 
 		if (this.neWindow.size() < minNovelty) {
-			MicroCluster micro = new MicroCluster(in, "", "anormal", timestamp);
+			MicroCluster micro = new MicroCluster(in, "", "anormal", timestamp, ConceptCategory.NOVELTY);
 			this.neWindow.add(micro);
 
 		} else {
@@ -388,7 +389,7 @@ public class kNN_kem2 extends AbstractClassifier implements MultiClassClassifier
 					// 3.1 Try to forget old kernels
 					for (int i = 0; i < this.neWindow.size(); i++) {
 						if (this.neWindow.get(i).getRelevanceStamp() < threshold) {
-							MicroCluster element = new MicroCluster(in, "", "anormal", timestamp);
+							MicroCluster element = new MicroCluster(in, "", "anormal", timestamp, ConceptCategory.NOVELTY);
 							this.neWindow.set(i, element);
 							sim = 1;
 //							 return;
@@ -416,7 +417,7 @@ public class kNN_kem2 extends AbstractClassifier implements MultiClassClassifier
 					assert (closestA != closestB);
 
 					this.neWindow.get(closestA).add(this.neWindow.get(closestB));
-					MicroCluster element = new MicroCluster(in, "", "anormal", timestamp);
+					MicroCluster element = new MicroCluster(in, "", "anormal", timestamp, ConceptCategory.NOVELTY);
 					this.neWindow.set(closestB, element);
 				}
 

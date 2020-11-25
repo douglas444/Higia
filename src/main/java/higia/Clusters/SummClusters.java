@@ -1,7 +1,6 @@
-package Clusters;
+package main.java.higia.Clusters;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -15,7 +14,7 @@ import moa.cluster.Clustering;
 import moa.cluster.SphereCluster;
 import moa.clusterers.AbstractClusterer;
 import moa.core.Measurement;
-import utils.InstanceKernel;
+import main.java.higia.utils.InstanceKernel;
 
 public class SummClusters extends AbstractClusterer{
 	
